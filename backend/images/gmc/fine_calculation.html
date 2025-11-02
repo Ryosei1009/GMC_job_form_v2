@@ -1,0 +1,525 @@
+<html>
+
+<head>
+    <style>
+        body {
+            background-color: #1E3955;
+            color: white;
+        }
+
+        textarea {
+            width: 50%;
+            height: 50px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        th,
+        td {
+            border: .5px solid white;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #23405E;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+
+        #summary {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            color: black;
+        }
+
+        #summary-crimes span {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .action-button {
+            padding: 10px 15px;
+            background-color: #add8e6;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background-color: #87cefa;
+        }
+
+
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #c82333;
+        }
+
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #back-to-top:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+
+        #scroll-to-bottom {
+            position: fixed;
+            bottom: 20px;
+            right: 120px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #scroll-to-bottom:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+
+        input[type="checkbox"] {
+            width: 25px;
+            height: 25px;
+        }
+
+        #wanted-summary {
+            position: fixed;
+            top: 10px;
+            right: 345px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            color: black;
+        }
+
+        #wanted-summary span {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
+    <script>
+        function calculateSelected() {
+            let totalFine = 0;
+            let totalTerm = 0;
+            let totalWantedTime = 0;
+            let selectedCrimes = [];
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            checkboxes.forEach(checkbox => {
+                totalFine += parseInt(checkbox.getAttribute('data-fine')) || 0;
+                totalTerm += parseInt(checkbox.getAttribute('data-term')) || 0;
+                totalWantedTime += parseInt(checkbox.getAttribute('data-wanted')) || 0;
+                selectedCrimes.push(checkbox.getAttribute('data-crime'));
+            });
+            document.getElementById('summary-crimes').innerText = selectedCrimes.join(", ") || "なし";
+            document.getElementById('summary-fine').innerText = totalFine.toLocaleString() + "万円";
+            document.getElementById('summary-term').innerText = totalTerm + "分";
+            document.getElementById('wanted-crimes').innerText = selectedCrimes.join(", ") || "なし";
+            document.getElementById('wanted-time').innerText = totalWantedTime + "分";
+        }
+
+        function copySelectedCrimes() {
+            const selectedCrimes = [];
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            checkboxes.forEach(checkbox => {
+                selectedCrimes.push(checkbox.getAttribute('data-crime'));
+            });
+
+            const crimeText = selectedCrimes.join(", ");
+
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = crimeText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+        }
+
+
+        function resetCheckboxes() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            calculateSelected();
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function copySummary() {
+            const summaryElement = document.getElementById("summary");
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = summaryElement.innerText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', calculateSelected);
+            });
+        }); 
+    </script>
+</head>
+
+<body>
+    <div id="summary">
+        <p><strong>罪状:</strong> <span id="summary-crimes">なし</span></p>
+        <p><strong>犯人:</strong> 関与した犯罪者に記載:</p>
+        <p><strong>罰金額:</strong> <span id="summary-fine">0万円</span></p>
+        <p><strong>状況説明:</strong></p>
+        <p><strong>刑期:</strong> <span id="summary-term">0分</span></p>
+    </div>
+    <div id="wanted-summary">
+        <p><strong>罪状:</strong> <span id="wanted-crimes">なし</span></p>
+        <p><strong>指名手配時間(最低30分):</strong> <span id="wanted-time">0分</span></p>
+    </div>
+
+    <h1></h1>
+    <button onclick="resetCheckboxes()">リセット</button>
+    <button class="action-button" onclick="copySelectedCrimes()">指名手配</button>
+    <button class="action-button" onclick="copySummary()">インシデント</button>
+    <table>
+        <tbody>
+            <tr>
+                <th>選択</th>
+                <th>罪状</th>
+                <th>内容</th>
+                <th style="width: 85px;">罰金額</th>
+                <th style="width: 32px;">刑期</th>
+                <th style="width: 32px;">指名手配時間</th>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="小型強盗" data-fine="50" data-term="10"
+                        data-wanted="30"></td>
+                <td>小型強盗</td>
+                <td>コンビニ強盗・ハウス強盗を行った犯罪者全員に罰金と刑期を課す</td>
+                <td>50万円</td>
+                <td>10分</td>
+                <td>30分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="中型強盗" data-fine="150" data-term="20"
+                        data-wanted="30"></td>
+                <td>中型強盗</td>
+                <td>フリーカ銀行強盗・宝石店強盗を行った犯罪者全員に罰金と刑期を課す</td>
+                <td>150万円</td>
+                <td>20分</td>
+                <td>30分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="準大型強盗" data-fine="350" data-term="30"
+                        data-wanted="0"></td>
+                <td>準大型強盗</td>
+                <td>飛行機強盗・豪華客船強盗・オイルリグ強盗・アーティファクト強盗・ボブキャット強盗・美術館強盗・飛行機墜落強盗・金庫強盗を行った犯罪者全員に罰金と刑期を課す</td>
+                <td>350万円</td>
+                <td>30分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="大型強盗" data-fine="1000" data-term="40"
+                        data-wanted="0"></td>
+                <td>大型強盗</td>
+                <td>パレト銀行強盗・ユニオン強盗などを行った犯罪者全員に罰金と刑期を課す</td>
+                <td>1,000万円</td>
+                <td>40分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="軽逃走補助罪" data-fine="300" data-term="15"
+                        data-wanted="0"></td>
+                <td>軽逃走補助罪</td>
+                <td>個人医が準大型強盗、大型強盗以外の際に、犯罪者の逃走を幇助した者に、罰金と刑期を科す<br>＜個人医リスト＞ドクタージャパニック、はにわキングダム、星乃宇月、ノーチェ オリヴィア、Lakuro</td>
+                <td>300万円</td>
+                <td>15分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="重逃走補助罪" data-fine="700" data-term="30"
+                        data-wanted="0"></td>
+                <td>重逃走補助罪</td>
+                <td>個人医が準大型強盗、大型強盗の際に、犯罪者の逃走を補助した者に、罰金と刑期を科す<br>＜個人医リスト＞ドクタージャパニック、はにわキングダム、星乃宇月、ノーチェ オリヴィア、Lakuro</td>
+                <td>700万円</td>
+                <td>30分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="威力業務妨害" data-fine="1000" data-term="30"
+                        data-wanted="0"></td>
+                <td>威力業務妨害</td>
+                <td>市民が経営する店舗の不利益になる行為をした者に罰金と刑期を課す</td>
+                <td>1,000万円</td>
+                <td>30分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="道路交通法違反" data-fine="50" data-term="0"
+                        data-wanted="0"></td>
+                <td>道路交通法違反</td>
+                <td>逆走・危険運転を行った運転者に罰金を科す</td>
+                <td>50万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="NPC殺人" data-fine="100" data-term="0"
+                        data-wanted="0"></td>
+                <td>NPC殺人</td>
+                <td>NPCを殺害したプレイヤーに罰金を科す</td>
+                <td>100万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="プレイヤー殺人未遂" data-fine="100" data-term="0"
+                        data-wanted="0"></td>
+                <td>プレイヤー殺人未遂</td>
+                <td>殺害できる行為(銃の発砲など)を行うも殺害に至らなかった場合に罰金を科す</td>
+                <td>100万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="プレイヤー殺人" data-fine="150" data-term="10"
+                        data-wanted="0"></td>
+                <td>プレイヤー殺人</td>
+                <td>プレイヤーを殺害したプレイヤーに罰金と刑期を課す</td>
+                <td>150万円</td>
+                <td>10分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="銃刀法違反" data-fine="50" data-term="0"
+                        data-wanted="0"></td>
+                <td>銃刀法違反</td>
+                <td>武器ライセンスを持っていないプレイヤーが、銃もしくは近接武器を所持していた場合に罰金を課す。<br>武器ライセンスを所持していた場合は、ピストルもしくは近接武器までの所持と使用が許可されているので、犯罪利用していない場合は罰金無し。犯罪利用していた場合は罰金を科す。<br>※ネタ武器は〇〇強盗での使用は法律で禁止されているため銃刀法は含まず、押収等も行わない。厳重注意とする
+                </td>
+                <td>50万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="公務執行妨害" data-fine="50" data-term="0"
+                        data-wanted="0"></td>
+                <td>公務執行妨害</td>
+                <td>警察＆救急隊を妨害したプレイヤーに罰金を科す</td>
+                <td>50万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="誘拐/監禁/人質" data-fine="50" data-term="0"
+                        data-wanted="0"></td>
+                <td>誘拐/監禁/人質</td>
+                <td>プレイヤーを拉致・監禁・人質にしたプレイヤーに罰金を科す</td>
+                <td>50万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="収賄罪" data-fine="1000" data-term="60"
+                        data-wanted="0"></td>
+                <td>収賄罪</td>
+                <td>公務員が汚職をした際に、罰金と刑期を科す。<br>※「この金額は最低金額であり、状況によっては罰金額は上昇する」</td>
+                <td>1,000万円</td>
+                <td>60分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="違法駐車" data-fine="10" data-term="0"
+                        data-wanted="0"></td>
+                <td>違法駐車</td>
+                <td>犯罪利用した車両があった場合、インパウンド料とは別に罰金を科す。犯罪利用した車両・放置車両には10万1時間で9153インパウンド場にインパウンドされる。</td>
+                <td>10万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="プレイヤー車両窃盗" data-fine="300" data-term="10"
+                        data-wanted="0"></td>
+                <td>プレイヤー車両窃盗</td>
+                <td>プレイヤーの車両を窃盗した際に、窃盗したプレイヤーに罰金を科す</td>
+                <td>300万円</td>
+                <td>10分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="NPC車両窃盗" data-fine="50" data-term="0"
+                        data-wanted="0"></td>
+                <td>NPC車両窃盗</td>
+                <td>NPCの車両を窃盗した際に、窃盗したプレイヤーに罰金を科す</td>
+                <td>50万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="ライセンス未所持" data-fine="50" data-term="0"
+                        data-wanted="0"></td>
+                <td>ライセンス未所持</td>
+                <td>各種ライセンスを所持せずにライセンスが必要な物を所持している場合において罰金を科す。<br>＜近接武器：ナイフ、バット、ナタ、ダガー＞<br>＜銃：ピストル系のハンドガン＞<br>※アサルトライフル系は含まない
+                </td>
+                <td>50万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="わいせつ罪" data-fine="1000" data-term="30"
+                        data-wanted="0"></td>
+                <td>わいせつ罪</td>
+                <td>わいせつ行為を、警察が目撃＆周囲のプレイヤーからの通報があった場合に、わいせつ行為を行ったプレイヤーに警察は刑期を科す。罰金は被害者に支払う。</td>
+                <td>1,000万円</td>
+                <td>30分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="脅迫/侮辱" data-fine="300" data-term="20"
+                        data-wanted="0"></td>
+                <td>脅迫/侮辱</td>
+                <td>他のプレイヤーを精神的暴行を行ったプレイヤーに罰金を科す。罰金は被害者に支払う。</td>
+                <td>300万円</td>
+                <td>20分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="テロ罪" data-fine="3000" data-term="30"
+                        data-wanted="0"></td>
+                <td>テロ罪</td>
+                <td>警察署・病院襲撃を行ったプレイヤーに罰金と刑期を科す。<br>※「この金額は最低金額であり、状況によっては罰金額は上昇する」</td>
+                <td>3,000万円</td>
+                <td>30分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="脱獄" data-fine="1000" data-term="0"
+                        data-wanted="60"></td>
+                <td>脱獄</td>
+                <td>刑務所の脱獄した本人・補助した者も同様に罰金を科す。<br>※3回以上脱獄を行った者、GPSを埋め込む。刑期は元の刑期の2倍<br>「この金額は最低金額であり、状況によっては罰金額は上昇する」
+                </td>
+                <td>1,000万円</td>
+                <td>0分</td>
+                <td>60分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="違法賭博罪" data-fine="30000" data-term="20"
+                        data-wanted="0"></td>
+                <td>違法賭博罪</td>
+                <td>2億円以上の価値があるものを取引するあらゆる賭博を行った者に罰金と刑期を科す</td>
+                <td>30,000万円</td>
+                <td>20分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="ペット傷害致死罪" data-fine="1000" data-term="30"
+                        data-wanted="0"></td>
+                <td>ペット傷害致死罪</td>
+                <td>ペットを殺害・傷害したプレイヤーに罰金と刑期を科す</td>
+                <td>1,000万円</td>
+                <td>30分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="麻薬作成" data-fine="0" data-term="10"
+                        data-wanted="0"></td>
+                <td>麻薬作成</td>
+                <td>麻薬の材料を収集していたプレイヤーに刑期を科す</td>
+                <td>0円</td>
+                <td>10分</td>
+                <td>0分</td>
+            </tr>
+
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-crime="麻薬所持" data-fine="1" data-term="0"
+                        data-wanted="undefined"></td>
+                <td>麻薬所持</td>
+                <td>麻薬の原材料&amp;麻薬の所持×1万円で所持していたプレイヤーに罰金を課す</td>
+                <td>1万円</td>
+                <td>0分</td>
+                <td>0分</td>
+            </tr>
+        </tbody>
+    </table>
+    作成者：蒼那 まるる
+</body>
+
+</html>

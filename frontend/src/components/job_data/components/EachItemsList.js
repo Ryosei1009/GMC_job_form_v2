@@ -1,0 +1,65 @@
+import React, { useEffect, useState } from 'react'
+import { CopyButton } from '../../newitem_list/EachItem';
+import GetJobName from '../../../utils/AccountUtil';
+import '../../newitem_list/code.css'
+import Prism from 'prismjs';
+import 'prismjs/components/prism-lua';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+
+const EachItemList = ({ job, userInfo, token }) => {
+    const [visible1, setVisible1] = useState(false);
+    const [item, setItem] = useState([]);
+    const [itemList, setItemList] = useState("");
+
+    useEffect(() => {
+        setItem([]);
+        if (job === "") return;
+        async function fetchNewItemList() {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item/get?role=${userInfo[0].role}&job=${job}&cancel=&add=`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                const data = await response.json();
+                setItem(data.filter(item => item.is_craft === 1));
+            } catch (error) {
+                console.error('Error fetching new item list:', error);
+            }
+        }
+
+        fetchNewItemList();
+    }, [userInfo, token, job]);
+
+    useEffect(() => {
+        const updatedItemList = item.map((item) => {
+            return `['${item.item_id}'] = { ['name'] = '${item.item_id}', ['image'] = '${item.item_id}.png', ['label'] = '${item.name}', ['weight'] = ${item.weight * 1000}, ['description'] = '${item.description}', ['type'] = 'item', ['unique'] = false, ['useable'] = true, ['shouldClose'] = true, ['combinable'] = nil, },\n`;
+        }).join('');
+        setItemList(updatedItemList);
+    }, [item]);
+
+
+    useEffect(() => {
+        Prism.highlightAll();
+    }, [itemList, visible1]);
+    return (
+        <div>
+            <p className="left-4 text-gray-600 font-bold">
+                qb-core/items.lua <span className="text-black"><GetJobName job_id={job} /></span>
+            </p>
+            <div className="relative">
+                <CopyButton code={itemList} />
+                <span onClick={() => setVisible1(!visible1)} className="absolute top-2 right-24 bg-[#4CAF50] rounded-md px-2 cursor-pointer">
+                    <ChevronDownIcon className="h-8 w-8 fill-white inline-block" />
+                </span>
+                <pre className={`scroll-hidden ${!visible1 && "max-h-12"}`}>
+                    <code className="language-lua pr-16">
+                        {itemList}
+                    </code>
+                </pre>
+            </div>
+        </div>
+    )
+}
+
+export default EachItemList
