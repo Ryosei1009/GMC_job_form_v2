@@ -183,7 +183,7 @@ const NewItemList = ({ userInfo, token }) => {
                 <div className="text-lg font-semibold text-gray-800 mb-2">
                   ステータスフィルター（複数選択可）
                 </div>
-                <div className="max-h-48 overflow-y-auto border-2 border-gray-300 rounded-lg p-3 bg-white">
+                <div className="max-h-48 overflow-y-auto border-2 border-gray-300 rounded-lg p-3 bg-white scroll-hidden">
                   {[
                     { value: "none", label: "申請中" },
                     { value: "check1", label: "ルール確認中" },
