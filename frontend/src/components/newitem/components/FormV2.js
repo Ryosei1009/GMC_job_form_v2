@@ -41,10 +41,6 @@ const FormV2 = ({
         fetchJobs();
     }, [userInfo, token]);
 
-    useEffect(() => {
-        console.log(formData);
-    }, [formData])
-
     // 素材選択用の入力値
     const [material1InputValue, setMaterial1InputValue] = useState('')
     const [material2InputValue, setMaterial2InputValue] = useState('')
@@ -811,21 +807,20 @@ const FormV2 = ({
                             <label className="text-lg">
                                 卸先店舗<span className="text-red-500"> *</span>
                             </label>
-                            <input
-                                className="border-b-2 border-b-gray-200 focus:outline-none"
+                            <select
                                 onChange={handleChange}
                                 value={formData.whole_shop}
-                                type="text"
-                                id="whole_shop"
                                 name="whole_shop"
-                                maxLength={15}
-                                placeholder="市役所"
-                            />
-                            <div className="flex justify-between text-gray-500">
-                                <div className="text-red-500 font-bold">
-                                    {(displayError && formData.is_wholesale === 1 && !formData.whole_shop) && (uploadError.whole_shop)}
-                                </div>
-                                <div>{formData.whole_shop.length}/15</div>
+                                className="w-full px-2 py-1 border-2 text-black border-gray-300 rounded-xl focus:outline-none cursor-pointer"
+                                id="whole_shop"
+                            >
+                                <option value="">選択してください。</option>
+                                {jobs.map((job) => (
+                                    <option key={job.id} value={job.name}>{job.name}</option>
+                                ))}
+                            </select>
+                            <div className="text-red-500 font-bold">
+                                {(displayError && formData.is_wholesale === 1 && !formData.whole_shop) && (uploadError.whole_shop)}
                             </div>
                         </div>
                     </>

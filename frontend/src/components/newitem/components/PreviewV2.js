@@ -63,12 +63,14 @@ const PreviewV2 = ({ formData, previewUrl, files }) => {
                             <div><span className="font-semibold">アイテムID:</span> {formData.item_id || "未設定"}</div>
                             <div><span className="font-semibold">説明:</span> {formData.description || "未設定"}</div>
                             <div><span className="font-semibold">重量:</span> {formData.weight || "未設定"}</div>
-                            {formData.emote && <div><span className="font-semibold">エモート:</span> {formData.emote}</div>}
+                            {formData.price && <div className="mt-2"><span className="font-semibold">価格:</span> {formData.price}円</div>}
+                            {formData.sale_date && <div><span className="font-semibold">販売日:</span> {formData.sale_date}</div>}
                         </div>
 
                         {/* アイテムタイプ・機能 */}
                         <div className="space-y-2">
                             <h4 className="font-semibold text-lg text-green-600">機能</h4>
+                            {formData.emote && <div><span className="font-semibold">エモート:</span> {formData.emote}</div>}
                             <div><span className="font-semibold">素材:</span> {formData.is_material === 1 ? "はい" : "いいえ"}</div>
                             <div><span className="font-semibold">クラフト:</span> {formData.is_craft === 1 ? "はい" : "いいえ"}</div>
                             <div><span className="font-semibold">アイテムタイプ:</span>
@@ -90,8 +92,6 @@ const PreviewV2 = ({ formData, previewUrl, files }) => {
                                 {formData.craft_material2 && <div><span className="font-semibold">素材2:</span> {formData.craft_material2}</div>}
                                 {formData.craft_material3 && <div><span className="font-semibold">素材3:</span> {formData.craft_material3}</div>}
                             </div>
-                            {formData.price && <div className="mt-2"><span className="font-semibold">価格:</span> {formData.price}円</div>}
-                            {formData.sale_date && <div><span className="font-semibold">販売日:</span> {formData.sale_date}</div>}
                         </div>
                     )}
 

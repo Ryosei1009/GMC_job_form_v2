@@ -34,4 +34,38 @@ const GetJobName = ({ token, job_id, defaultJobs }) => {
     )
 }
 
+export const GetUserName = ({ token, user_id }) => {
+    const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+        if (!user_id || !token) {
+            return;
+        }
+
+        async function fetchUserName() {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/account/username/${user_id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserName(data.username);
+                } else {
+                    setUserName(`User_${user_id}`); // フォールバック
+                }
+            } catch (error) {
+                console.error('Error fetching username:', error);
+                setUserName(`User_${user_id}`); // フォールバック
+            }
+        }
+
+        fetchUserName();
+    }, [user_id, token]);
+
+    return <>{userName}</>;
+};
+
 export default GetJobName

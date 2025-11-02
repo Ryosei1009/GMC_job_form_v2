@@ -10,9 +10,21 @@ import ItemControl from './components/ItemControl';
 import Image from './components/Image';
 import Audio from './components/Audio';
 import Give from './components/Give';
+import { GetUserName } from '../../utils/AccountUtil';
 
 const EachItem = ({ item, token, materials, userInfo, pageRefs, jobs }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    // 日時を MM/DD hh:mm 形式でフォーマットする関数
+    const formatDateTime = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${month}/${day} ${hours}:${minutes}`;
+    };
 
     useEffect(() => {
         Prism.highlightAll();
@@ -212,6 +224,23 @@ const EachItem = ({ item, token, materials, userInfo, pageRefs, jobs }) => {
                             ) : ""}
                         </div>
                     </div>
+                    {(item.rule_checker1 || item.rule_checker2) && (userInfo[0].role === "admin" || userInfo[0].role === "owner") && (
+                        <div className="mt-2">
+                            <div className="text-lg font-bold">
+                                ルール確認者
+                            </div>
+                            {item.rule_checker1 && (
+                                <div className="text-sm text-gray-600">
+                                    <GetUserName token={token} user_id={item.rule_checker1} /> ({formatDateTime(item.rule_check1_time)})
+                                </div>
+                            )}
+                            {item.rule_checker2 && (
+                                <div className="text-sm text-gray-600">
+                                    <GetUserName token={token} user_id={item.rule_checker2} /> ({formatDateTime(item.rule_check2_time)})
+                                </div>
+                            )}
+                        </div>
+                    )}
                     {item.other !== null && (
                         <div className="mt-2">
                             <div className="text-lg font-bold">

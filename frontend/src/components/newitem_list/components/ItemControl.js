@@ -65,6 +65,9 @@ const ItemControl = ({ userInfo, item, token, jobs }) => {
     details: ''
   });
 
+  // 削除モーダル用の状態
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const makeStatusRequest = useCallback(async (status, successState, errorState) => {
     successState();
     try {
@@ -130,6 +133,62 @@ const ItemControl = ({ userInfo, item, token, jobs }) => {
   const handleRuleCheck1 = () => makeStatusRequest('check1', () => setRuleCheck(1), () => setRuleCheck(0));
   const handleRuleCheck2 = () => makeStatusRequest('check2', () => setRuleCheck(2), () => setRuleCheck(1));
 
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_DOMAIN}/new_item_v2/delete/${item.id}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      setShowDeleteModal(false);
+      // ページをリロードして削除されたアイテムを非表示にする
+      window.location.reload();
+    } catch (error) {
+      console.error('Delete request failed:', error);
+      setShowDeleteModal(false);
+
+      let errorTitle = "削除エラー";
+      let errorMessage = "アイテムの削除に失敗しました。";
+      let errorDetails = "";
+
+      if (error.response) {
+        const status = error.response.status;
+        const responseData = error.response.data;
+
+        switch (status) {
+          case 401:
+            errorTitle = "認証エラー";
+            errorMessage = "認証に失敗しました。再ログインしてください。";
+            break;
+          case 403:
+            errorTitle = "権限エラー";
+            errorMessage = "削除する権限がありません。";
+            break;
+          case 404:
+            errorTitle = "アイテムエラー";
+            errorMessage = "削除対象のアイテムが見つかりません。";
+            break;
+          case 500:
+            errorTitle = "サーバーエラー";
+            errorMessage = "サーバー内部でエラーが発生しました。";
+            break;
+          default:
+            errorDetails = `ステータスコード: ${status}\n${typeof responseData === 'string' ? responseData : JSON.stringify(responseData)}`;
+        }
+      } else if (error.request) {
+        errorTitle = "通信エラー";
+        errorMessage = "サーバーとの通信に失敗しました。";
+      } else {
+        errorDetails = error.message;
+      }
+
+      setErrorModal({
+        isOpen: true,
+        title: errorTitle,
+        message: errorMessage,
+        details: errorDetails
+      });
+    }
+  };
+
   const userRole = userInfo?.[0]?.role;
   const itemUrl = `${process.env.REACT_APP_SITE_DOMAIN}/newitemlist#${item.id}`;
 
@@ -142,7 +201,15 @@ const ItemControl = ({ userInfo, item, token, jobs }) => {
             <div />
             <CopyButton textToCopy={itemUrl} />
           </div>
-          <div />
+          {/* 管理者、オーナー、確認者のみ完全削除ボタンを表示 */}
+          {(userRole === 'admin' || userRole === 'owner' || userRole === 'check') && (
+            <button
+              className="px-6 py-2 bg-red-800 text-white rounded-md hover:bg-red-900"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              完全削除
+            </button>
+          )}
           <button className="px-6 py-2 bg-red-500 text-white rounded-md" onClick={handleCancelCancel}>
             キャンセル取り消し
           </button>
@@ -250,7 +317,15 @@ const ItemControl = ({ userInfo, item, token, jobs }) => {
             <div />
             <CopyButton textToCopy={itemUrl} />
           </div>
-          <div />
+          {/* 管理者、オーナー、確認者のみ完全削除ボタンを表示 */}
+          {(userRole === 'admin' || userRole === 'owner' || userRole === 'check') && (
+            <button
+              className="px-6 py-2 bg-red-800 text-white rounded-md hover:bg-red-900"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              完全削除
+            </button>
+          )}
           <button className="px-6 py-2 bg-red-500 text-white rounded-md" onClick={handleCancelCancel}>
             キャンセル取り消し
           </button>
@@ -360,6 +435,41 @@ const ItemControl = ({ userInfo, item, token, jobs }) => {
       <div className="flex flex-row-reverse justify-between items-center w-full p-2 border-b">
         {renderContent()}
       </div>
+
+      {/* 削除確認モーダル */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-red-600 mb-2">⚠️ 完全削除の確認</h3>
+              <div className="text-gray-700 space-y-2">
+                <p className="font-semibold">この操作は取り消すことができません。</p>
+                <p>以下のアイテムを完全に削除します：</p>
+                <div className="bg-gray-100 p-3 rounded">
+                  <p className="font-semibold">{item.name} ({item.item_id})</p>
+                </div>
+                <p className="text-red-600 font-semibold">
+                  ※ 削除後は復元できません。関連するファイルも全て削除されます。
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                完全削除を実行
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* エラーモーダル */}
       <ErrorModal

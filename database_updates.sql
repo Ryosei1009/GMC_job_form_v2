@@ -1,0 +1,6 @@
+-- ルール確認者を記録するためのカラムを追加
+ALTER TABLE new_item
+ADD COLUMN rule_checker1 VARCHAR(255) DEFAULT NULL,
+ADD COLUMN rule_check1_time DATETIME DEFAULT NULL,
+ADD COLUMN rule_checker2 VARCHAR(255) DEFAULT NULL,
+ADD COLUMN rule_check2_time DATETIME DEFAULT NULL;

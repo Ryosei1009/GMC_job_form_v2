@@ -9,8 +9,33 @@ const NewItemList = ({ userInfo, token }) => {
   const [loading, setLoading] = useState(true);
   const pageRefs = useRef({});
   const [jobs, setJobs] = useState([]);
-  const [job, setJob] = useState(userInfo[0].role === "admin" ? "" : userInfo[0].job);
-  const [addStatus, setAddStatus] = useState("");
+
+  // localstorageからフィルター設定を読み込み
+  const loadFiltersFromStorage = () => {
+    try {
+      const savedFilters = localStorage.getItem('newItemListFilters');
+      if (savedFilters) {
+        const parsedFilters = JSON.parse(savedFilters);
+        return {
+          job: userInfo[0].role === "admin" ? parsedFilters.job || "" : userInfo[0].job,
+          addStatus: Array.isArray(parsedFilters.addStatus) ? parsedFilters.addStatus : (parsedFilters.addStatus ? [parsedFilters.addStatus] : []),
+          wholeShop: parsedFilters.wholeShop || ""
+        };
+      }
+    } catch (error) {
+      console.error('Failed to load filters from localStorage:', error);
+    }
+    return {
+      job: userInfo[0].role === "admin" ? "" : userInfo[0].job,
+      addStatus: [],
+      wholeShop: ""
+    };
+  };
+
+  const initialFilters = loadFiltersFromStorage();
+  const [job, setJob] = useState(initialFilters.job);
+  const [addStatus, setAddStatus] = useState(initialFilters.addStatus);
+  const [wholeShop, setWholeShop] = useState(initialFilters.wholeShop);
   const [search, setSearch] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,7 +78,8 @@ const NewItemList = ({ userInfo, token }) => {
     async function fetchNewItemList() {
       setLoading(true);
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item_v2/get?role=${userInfo[0].role}&job=${job}&add_status=${addStatus}&search=${search}&page=${currentPage}&limit=${itemsPerPage}`, {
+        const addStatusQuery = Array.isArray(addStatus) && addStatus.length > 0 ? addStatus.join(',') : '';
+        const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item_v2/get?role=${userInfo[0].role}&job=${job}&add_status=${addStatusQuery}&whole_shop=${wholeShop}&search=${search}&page=${currentPage}&limit=${itemsPerPage}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
@@ -69,7 +95,21 @@ const NewItemList = ({ userInfo, token }) => {
       setLoading(false);
     }
     fetchNewItemList();
-  }, [userInfo, token, job, addStatus, search, currentPage, itemsPerPage]);
+  }, [userInfo, token, job, addStatus, wholeShop, search, currentPage, itemsPerPage]);
+
+  // フィルター設定をlocalstorageに保存
+  useEffect(() => {
+    try {
+      const filtersToSave = {
+        job: userInfo[0].role === "admin" ? job : "",  // オーナーの場合は保存しない
+        addStatus,
+        wholeShop
+      };
+      localStorage.setItem('newItemListFilters', JSON.stringify(filtersToSave));
+    } catch (error) {
+      console.error('Failed to save filters to localStorage:', error);
+    }
+  }, [job, addStatus, wholeShop, userInfo]);
 
   useEffect(() => {
     if (!loading) {
@@ -108,7 +148,7 @@ const NewItemList = ({ userInfo, token }) => {
         <div className="max-w-5xl w-full mb-16">
           <div className="mt-4 bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-200">
             <div className="md:flex gap-6">
-              <div className="md:w-1/2">
+              <div className="md:w-1/3">
                 <label className="block text-lg font-semibold text-gray-800 mb-2">
                   JOBフィルター
                 </label>
@@ -138,23 +178,60 @@ const NewItemList = ({ userInfo, token }) => {
                   )}
                 </select>
               </div>
-              
-              <div className="md:w-1/2 mt-6 md:mt-0">
+
+              <div className="md:w-1/3 mt-6 md:mt-0">
                 <div className="text-lg font-semibold text-gray-800 mb-2">
-                  ステータスフィルター
+                  ステータスフィルター（複数選択可）
+                </div>
+                <div className="max-h-48 overflow-y-auto border-2 border-gray-300 rounded-lg p-3 bg-white">
+                  {[
+                    { value: "none", label: "申請中" },
+                    { value: "check1", label: "ルール確認中" },
+                    { value: "check2", label: "ルール確認済み" },
+                    { value: "pending", label: "審議中" },
+                    { value: "add", label: "追加済み" },
+                    { value: "cancel", label: "キャンセル済み" }
+                  ].map((status) => (
+                    <label key={status.value} className="flex items-center mb-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={addStatus.includes(status.value)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAddStatus([...addStatus, status.value]);
+                          } else {
+                            setAddStatus(addStatus.filter(s => s !== status.value));
+                          }
+                        }}
+                        className="mr-2 w-4 h-4"
+                      />
+                      <span className="text-sm text-gray-700">{status.label}</span>
+                    </label>
+                  ))}
+                  {addStatus.length > 0 && (
+                    <button
+                      onClick={() => setAddStatus([])}
+                      className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+                    >
+                      全て解除
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="md:w-1/3 mt-6 md:mt-0">
+                <div className="text-lg font-semibold text-gray-800 mb-2">
+                  卸先店舗フィルター
                 </div>
                 <select
-                  onChange={(event) => setAddStatus(event.target.value)}
+                  onChange={(event) => setWholeShop(event.target.value)}
                   className="w-full px-4 py-3 border-2 text-gray-700 bg-white border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer shadow-sm transition-all duration-200 hover:border-gray-400"
-                  value={addStatus}
+                  value={wholeShop}
                 >
                   <option value="">全て表示</option>
-                  <option value="none">申請中</option>
-                  <option value="check1">ルール確認中</option>
-                  <option value="check2">ルール確認済み</option>
-                  <option value="pending">審議中</option>
-                  <option value="add">追加済み</option>
-                  <option value="cancel">キャンセル済み</option>
+                  {jobs.map((job) => (
+                    <option key={job.id} value={job.name}>{job.name}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -190,13 +267,9 @@ const NewItemList = ({ userInfo, token }) => {
             </div>
           )}
           {newItemList.length === 0 ? "申請した商品がありません。" : (
-            <>
-              {console.log('NewItemList Debug - userInfo:', userInfo)}
-              {console.log('NewItemList Debug - userInfo[0]:', userInfo ? userInfo[0] : 'undefined')}
-              {newItemList.map((item) => (
-                <EachItem key={item.id} item={item} token={token} materials={materials} userInfo={userInfo} pageRefs={pageRefs} jobs={jobs} />
-              ))}
-            </>
+            newItemList.map((item) => (
+              <EachItem key={item.id} item={item} token={token} materials={materials} userInfo={userInfo} pageRefs={pageRefs} jobs={jobs} />
+            ))
           )}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-4">

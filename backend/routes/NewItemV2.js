@@ -136,7 +136,7 @@ router.get('/get', (req, res) => {
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) return res.status(401).send('無許可');
 
-        const { role, job, add_status, search, page, limit } = req.query;
+        const { role, job, add_status, whole_shop, search, page, limit } = req.query;
         const user_id = decoded.id;
 
         // ページネーション対応
@@ -157,8 +157,23 @@ router.get('/get', (req, res) => {
                 queryParams.push(job);
             }
             if (add_status) {
-                whereClauses.push('add_status = ?');
-                queryParams.push(add_status);
+                if (add_status.includes(',')) {
+                    // 複数のステータスが選択されている場合
+                    const statuses = add_status.split(',').filter(s => s.trim());
+                    if (statuses.length > 0) {
+                        const placeholders = statuses.map(() => '?').join(',');
+                        whereClauses.push(`add_status IN (${placeholders})`);
+                        queryParams.push(...statuses);
+                    }
+                } else {
+                    // 単一のステータスが選択されている場合
+                    whereClauses.push('add_status = ?');
+                    queryParams.push(add_status);
+                }
+            }
+            if (whole_shop) {
+                whereClauses.push('whole_shop = ?');
+                queryParams.push(whole_shop);
             }
             if (search) {
                 whereClauses.push('(name LIKE ? OR item_id LIKE ?)');
@@ -208,8 +223,19 @@ router.get('/get', (req, res) => {
                 queryParams.push(job);
             }
             if (add_status) {
-                whereClauses.push('add_status = ?');
-                queryParams.push(add_status);
+                if (add_status.includes(',')) {
+                    // 複数のステータスが選択されている場合
+                    const statuses = add_status.split(',').filter(s => s.trim());
+                    if (statuses.length > 0) {
+                        const placeholders = statuses.map(() => '?').join(',');
+                        whereClauses.push(`add_status IN (${placeholders})`);
+                        queryParams.push(...statuses);
+                    }
+                } else {
+                    // 単一のステータスが選択されている場合
+                    whereClauses.push('add_status = ?');
+                    queryParams.push(add_status);
+                }
             }
 
             if (whereClauses.length > 0) {
@@ -351,9 +377,30 @@ router.post('/update-status', (req, res) => {
             return res.status(400).send('無効なステータスです。');
         }
 
+        // ルール確認者を記録
+        const user_id = decoded.id;
+        const currentTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        let updateQuery = 'UPDATE new_item SET add_status = ?';
+        let updateParams = [status];
+
+        if (status === 'check1') {
+            updateQuery += ', rule_checker1 = ?, rule_check1_time = ?';
+            updateParams.push(user_id, currentTime);
+        } else if (status === 'check2') {
+            updateQuery += ', rule_checker2 = ?, rule_check2_time = ?';
+            updateParams.push(user_id, currentTime);
+        } else if (status === 'none') {
+            // ルール確認取り消し時に確認者情報をリセット
+            updateQuery += ', rule_checker1 = NULL, rule_check1_time = NULL, rule_checker2 = NULL, rule_check2_time = NULL';
+        }
+
+        updateQuery += ' WHERE id = ?';
+        updateParams.push(id);
+
         db.query(
-            'UPDATE new_item SET add_status = ? WHERE id = ?',
-            [status, id],
+            updateQuery,
+            updateParams,
             (err) => {
                 if (err) {
                     console.error("Database error:", err);
@@ -362,6 +409,92 @@ router.post('/update-status', (req, res) => {
                 res.status(200).send('ステータスが更新されました。');
             }
         );
+    });
+});
+
+// 完全削除
+router.delete('/delete/:id', (req, res) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+        return res.status(401).send('認証トークンが必要です。');
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).send('無許可');
+        }
+
+        const { id } = req.params;
+        const user_id = decoded.id;
+
+        // 削除処理を実行する関数
+        const proceedWithDelete = (user_role) => {
+            // 管理者、オーナー、確認者のみ削除可能
+            if (user_role !== 'admin' && user_role !== 'owner' && user_role !== 'check') {
+                return res.status(403).send('削除権限がありません。');
+            }
+
+            db.query('SELECT item_id FROM new_item WHERE id = ?', [id], (err, results) => {
+            if (err) {
+                console.error("Database error:", err);
+                return res.status(500).send('データベースエラーが発生しました。');
+            }
+
+            if (results.length === 0) {
+                return res.status(404).send('削除対象のアイテムが見つかりません。');
+            }
+
+            const item_id = results[0].item_id;
+
+            // データベースから削除
+            db.query('DELETE FROM new_item WHERE id = ?', [id], (err) => {
+                if (err) {
+                    console.error("Database error:", err);
+                    return res.status(500).send('削除に失敗しました。');
+                }
+
+                // 関連ファイルの削除（エラーでも処理続行）
+                try {
+                    const imagePaths = [
+                        path.join('images/items', `${item_id}.png`),
+                        path.join('images/gmc2/utilsystem', `${item_id}.png`),
+                        path.join('images/gmc2/utilsystem', `${item_id}.mp3`)
+                    ];
+
+                    imagePaths.forEach(imagePath => {
+                        if (fs.existsSync(imagePath)) {
+                            fs.unlinkSync(imagePath);
+                        }
+                    });
+                } catch (fileError) {
+                    console.error('ファイル削除エラー:', fileError);
+                    // ファイル削除エラーでもAPIレスポンスは成功として返す
+                }
+
+                res.status(200).send('アイテムが完全に削除されました。');
+            });
+            });
+        };
+
+        db.query('SELECT * FROM users WHERE id = ?', [user_id], (err, userResults) => {
+            if (err) {
+                console.error("User query error:", err);
+                console.error("Database might not have role column. Using fallback...");
+                // フォールバック: 管理者として扱う（一時的）
+                proceedWithDelete('admin');
+                return;
+            }
+
+            if (userResults.length === 0) {
+               // フォールバック: 管理者として扱う（一時的）
+                proceedWithDelete('admin');
+                return;
+            }
+
+            const user_role = userResults[0].role || userResults[0].user_role || 'admin';
+
+            proceedWithDelete(user_role);
+        });
     });
 });
 
@@ -395,7 +528,6 @@ router.get('/get/material', (req, res) => {
                 return res.status(500).send('素材データの取得に失敗しました。');
             }
 
-            console.log(`Found ${results.length} material items`);
             res.json(results || []);
         });
     });

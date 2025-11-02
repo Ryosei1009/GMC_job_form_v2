@@ -110,6 +110,37 @@ router.get('/getall', (req, res) => {
     });
 });
 
+// ユーザー名を取得するAPIエンドポイント
+router.get('/username/:id', (req, res) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+        return res.status(401).send('認証トークンが必要です。');
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) return res.status(401).send('無許可');
+
+        const { id } = req.params;
+
+        db.query(
+            'SELECT username FROM users WHERE id = ?',
+            [id],
+            (err, results) => {
+                if (err) {
+                    console.error("Database error:", err);
+                    return res.status(500).send('データの取得に失敗しました。');
+                }
+
+                if (results.length === 0) {
+                    return res.status(404).send('ユーザーが見つかりません。');
+                }
+
+                res.json({ username: results[0].username });
+            }
+        );
+    });
+});
+
 router.post('/job/update', (req, res) => {
     const token = req.headers['authorization'].split(' ')[1];
 
