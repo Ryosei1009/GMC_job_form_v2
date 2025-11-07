@@ -13,7 +13,7 @@ const Header = ({ setToken, userInfo, token }) => {
                     <div className="flex items-center mr-8">
                         <img src="/images/logo.png" alt="GMC Logo" className="md:w-12 md:h-12 w-8 h-8 rounded-lg drop-shadow-md" />
                         <span className="ml-3 text-lg md:text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
-                            GMC JobForm V2
+                            GMC JobForm v2
                         </span>
                     </div>
 
