@@ -97,7 +97,7 @@ const Effect = ({ item }) => {
     return (
         <div>
             <p className="left-4 text-gray-600 font-bold">
-                jim-consumables/config.lua
+                jim-consumables/shared/consumables.lua
             </p>
             <div className="relative">
                 <CopyButton item={item} code={code} />

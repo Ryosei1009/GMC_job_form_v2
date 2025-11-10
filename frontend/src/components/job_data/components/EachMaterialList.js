@@ -17,7 +17,7 @@ const EachMaterialList = ({ job, userInfo, token }) => {
         setShopItems([]);
         async function fetchNewItemList() {
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item/get?role=${userInfo[0].role}&job=&cancel=&add=`, {
+                const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item_v2/get?role=${userInfo[0].role}&job=&add_status=add&whole_shop=&search=&page=&limit=3000`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     }
@@ -30,29 +30,18 @@ const EachMaterialList = ({ job, userInfo, token }) => {
         }
         async function fetchMaterials() {
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item/get/job_material`, {
+                const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item_v2/get/material`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'job': `${job}`,
+                        // 'job': `${job}`,
                     }
                 });
                 const data = await response.json();
-                data.forEach((material) => {
-                    setShopItems((prevShopItems) => {
-                        const newMaterials = [material.material1, material.material2, material.material3]
-                            .filter(
-                                (newMaterial) =>
-                                    newMaterial &&
-                                    !prevShopItems.includes(newMaterial)
-                            );
-                        return [...prevShopItems, ...newMaterials];
-                    });
-                });
+                setShopItems(data);
             } catch (error) {
                 console.error('Error fetching new item list:', error);
             }
         }
-
         fetchMaterials();
         fetchNewItemList();
     }, [userInfo, token, job]);
@@ -60,17 +49,17 @@ const EachMaterialList = ({ job, userInfo, token }) => {
     useEffect(() => {
         const getItemName = (item_id) => {
             const item = itemList.find((item) => item.item_id === item_id);
-            return item ? item.name : null;
+            return item.name;
         };
         const updatedShopItemList = shopItems.map((item) => {
-            const label = getItemName(item);
-            return `{ item = "${item}", label = '${label}', price = 0 },\n`;
+            const label = getItemName(item.material_id);
+            return `{ item = "${item.material_id}", label = '${label}', price = 0 },\n`;
         }).join('');
         setShopItemList(updatedShopItemList);
 
         const updatedCraftItemList = shopItems.map((item) => {
-            const label = getItemName(item);
-            return `${item} = '${label}',\n`;
+            const label = getItemName(item.material_id);
+            return `${item.material_id} = '${label}',\n`;
         }).join('');
         setCraftItemList(updatedCraftItemList);
     }, [shopItems, itemList]);

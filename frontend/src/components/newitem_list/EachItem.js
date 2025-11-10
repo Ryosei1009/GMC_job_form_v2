@@ -224,7 +224,7 @@ const EachItem = ({ item, token, materials, userInfo, pageRefs, jobs }) => {
                             ) : ""}
                         </div>
                     </div>
-                    {(item.rule_checker1 || item.rule_checker2) && (userInfo[0].role === "admin" || userInfo[0].role === "owner") && (
+                    {(item.rule_checker1 || item.rule_checker2) && (userInfo[0].role === "admin" || userInfo[0].role === "check") && (
                         <div className="mt-2">
                             <div className="text-lg font-bold">
                                 ルール確認者

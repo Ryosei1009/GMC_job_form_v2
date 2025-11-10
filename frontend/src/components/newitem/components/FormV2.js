@@ -346,7 +346,7 @@ const FormV2 = ({
                 {(formData.item_type === "effect" || formData.item_type === "image" || formData.item_type === "audio" || formData.item_type === "giveitem") && (
                     <div className="relative flex flex-col mt-12 bg-white px-6 pt-6 pb-3 rounded-md border-gray-300 border-1">
                         <label className="text-lg" htmlFor="emote">エモート</label>
-                        <div className="text-gray-500 text-sm">アイテム使用時に表示されるエモート</div>
+                        <div className="text-gray-500 text-sm">アイテム使用時に表示されるエモート<br />/eのあとに入力するエモートのIDのみ入力してください。/e drinkの場合は"drink"のみ</div>
                         <input
                             className="border-b-2 border-b-gray-200 focus:outline-none"
                             onChange={handleChange}
@@ -392,6 +392,7 @@ const FormV2 = ({
                             <label className="text-lg">
                                 使用時間 (秒)<span className="text-red-500"> *</span>
                             </label>
+                            <div className="text-gray-500 text-sm">デフォルト(最短)で5~6秒のランダムです。 <br />回復効果付きのアイテムでカスタマイズしたい場合は6秒以上にしてください。<br />効果付きアイテムで6秒未満の場合は5~6秒のランダムで設定します。</div>
                             <input
                                 className="border-b-2 border-b-gray-200 focus:outline-none"
                                 onChange={handleChange}
@@ -400,7 +401,7 @@ const FormV2 = ({
                                 id="effect_time"
                                 name="effect_time"
                                 maxLength={4}
-                                placeholder="5"
+                                placeholder="6"
                             />
                             <div className="flex justify-between text-gray-500">
                                 <div className="text-red-500 font-bold">

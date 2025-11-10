@@ -16,13 +16,13 @@ const EachEffectList = ({ job, userInfo, token }) => {
         if (job === "") return;
         async function fetchNewItemList() {
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item/get?role=${userInfo[0].role}&job=${job}&cancel=&add=`, {
+                const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/new_item_v2/get?role=${userInfo[0].role}&job=${job}&add_status=add&whole_shop=&search=&page=&limit=3000`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     }
                 });
                 const data = await response.json();
-                setItem(data.filter(item => item.is_craft === 1));
+                setItem(data.filter(item => item.is_effect === 1));
             } catch (error) {
                 console.error('Error fetching new item list:', error);
             }
@@ -32,7 +32,12 @@ const EachEffectList = ({ job, userInfo, token }) => {
     }, [userInfo, token, job]);
 
     const selectEmote = (item) => {
-        switch (item.item_type) {
+        // v2では emote フィールドが直接設定されている場合はそれを使用
+        if (item.emote) {
+            return item.emote;
+        }
+        // v1互換性のため、item_typeに基づくデフォルト設定
+        switch (item.effect_item_type || item.item_type) {
             case "food":
                 return "sandwich";
             case "drink":
@@ -46,31 +51,79 @@ const EachEffectList = ({ job, userInfo, token }) => {
     
     const selectStress = (item) => {
         if(item.effect_type === "stress") {
-            return `stress = math.random(${item.effect}, ${item.effect}),`
+            const amount = item.effect_amount || item.effect || 0;
+            return ` stress = math.random(${amount}, ${amount}),`
         } else {
-            return "stress = math.random(0, 0),"
+            return ""
         }
     }
 
     const selectHunger = (item) => {
         if(item.effect_type === "hunger") {
-            return `hunger = math.random(${item.effect}, ${item.effect}),`
+            const amount = item.effect_amount || item.effect || 0;
+            return ` hunger = math.random(${amount}, ${amount}),`
         } else {
-            return "hunger = math.random(0, 0),"
+            return ""
         }
     }
 
     const selectThirst = (item) => {
         if(item.effect_type === "thirst") {
-            return `thirst = math.random(${item.effect}, ${item.effect}),`
+            const amount = item.effect_amount || item.effect || 0;
+            return ` thirst = math.random(${amount}, ${amount}),`
         } else {
-            return "thirst = math.random(0, 0),"
+            return ""
         }
+    }
+
+    const selectHeal = (item) => {
+        if(item.effect_type === "heal") {
+            const amount = item.effect_amount || item.effect || 0;
+            return ` heal = ${amount},`;
+        } else {
+            return "";
+        }
+    }
+
+    // v2では effect_time を使用、v1互換性のため時間設定
+    const getTime = (item) => {
+        if (item.effect_time) {
+            return `math.random(${item.effect_time * 1000}, ${item.effect_time * 1000})`;
+        }
+        return "math.random(5000, 6000)";
+    }
+
+    const getReward = (item) => {
+        if (item.effect_grant) {
+            return `, amounttogive = ${item.effect_grant_count}, rewards = {[1] = { item = "${item.effect_grant}", max = ${item.effect_grant_count}, rarity = 1, }}`;
+        }
+        return "";
+    }
+
+    const getRequiredItem = (item) => {
+        if (item.effect_required) {
+            return `requiredItem = "${item.effect_required}",`;
+        }
+        return "";
+    }
+
+    const getScreenEffect = (item) => {
+        if (item.effect_screen) {
+            return ` screen = "${item.effect_screen}",`;
+        }
+        return "";
+    }
+
+    const getOD = (item) => {
+        if (item.effect_is_od) {
+            return ` canOD = true,`;
+        }
+        return "";
     }
 
     useEffect(() => {
         const updatedEffectList = item.map((item) => {
-            return `["${item.item_id}"] = { emote = "${selectEmote(item)}", 	canRun = false, time = math.random(5000, 6000), ${selectStress(item)} heal = 0, armor = 0, type = "${item.item_type}", stats = { ${selectHunger(item)} ${selectThirst(item)} }},\n`;
+            return `["${item.item_id}"] = { emote = "${selectEmote(item)}", canRun = false, time = ${getTime(item)},${selectStress(item)}${selectHeal(item)} type = "${item.effect_item_type || item.item_type}", ${getRequiredItem(item)} stats = {${selectHunger(item)}${selectThirst(item)}${getScreenEffect(item)}${getOD(item)} }${getReward(item)}},\n`;
         }).join('');
         setEffectList(updatedEffectList);
     }, [item]);
@@ -82,7 +135,7 @@ const EachEffectList = ({ job, userInfo, token }) => {
     return (
         <div>
             <p className="left-4 text-gray-600 font-bold">
-                jim-consumables/config.lua <span className="text-black"><GetJobName job_id={job} /></span>
+                jim-consumables/shared/consumables.lua <span className="text-black"><GetJobName job_id={job} /></span>
             </p>
             <div className="relative">
                 <CopyButton code={effectList} />
