@@ -8,11 +8,9 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 const EachMaterialList = ({ job, userInfo, token }) => {
     const [visible1, setVisible1] = useState(false);
-    const [visible2, setVisible2] = useState(false);
     const [shopItemList, setShopItemList] = useState("");
     const [itemList, setItemList] = useState([]);
     const [shopItems, setShopItems] = useState([]);
-    const [craftItemList, setCraftItemList] = useState("");
     useEffect(() => {
         setShopItems([]);
         async function fetchNewItemList() {
@@ -49,25 +47,19 @@ const EachMaterialList = ({ job, userInfo, token }) => {
     useEffect(() => {
         const getItemName = (item_id) => {
             const item = itemList.find((item) => item.item_id === item_id);
-            return item.name;
+            return item ? item.name : '';
         };
         const updatedShopItemList = shopItems.map((item) => {
             const label = getItemName(item.material_id);
             return `{ item = "${item.material_id}", label = '${label}', price = 0 },\n`;
         }).join('');
         setShopItemList(updatedShopItemList);
-
-        const updatedCraftItemList = shopItems.map((item) => {
-            const label = getItemName(item.material_id);
-            return `${item.material_id} = '${label}',\n`;
-        }).join('');
-        setCraftItemList(updatedCraftItemList);
     }, [shopItems, itemList]);
 
 
     useEffect(() => {
         Prism.highlightAll();
-    }, [shopItemList, visible1, visible2]);
+    }, [shopItemList, visible1]);
     return (
         <div>
             <p className="left-4 text-gray-600 font-bold">
@@ -81,20 +73,6 @@ const EachMaterialList = ({ job, userInfo, token }) => {
                 <pre className={`scroll-hidden ${!visible1 && "max-h-12"}`}>
                     <code className="language-lua pr-16">
                         {shopItemList}
-                    </code>
-                </pre>
-            </div>
-            <p className="left-4 text-gray-600 font-bold">
-                okokCrafting/config.lua <span className="text-black"><GetJobName job_id={job} /></span>
-            </p>
-            <div className="relative">
-                <CopyButton code={craftItemList} />
-                <span onClick={() => setVisible2(!visible2)} className="absolute top-2 right-24 bg-[#4CAF50] rounded-md px-2 cursor-pointer">
-                    <ChevronDownIcon className="h-8 w-8 fill-white inline-block" />
-                </span>
-                <pre className={`scroll-hidden ${!visible2 && "max-h-12"}`}>
-                    <code className="language-lua pr-16">
-                        {craftItemList}
                     </code>
                 </pre>
             </div>

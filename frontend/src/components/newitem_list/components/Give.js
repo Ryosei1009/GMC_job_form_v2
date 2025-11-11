@@ -17,7 +17,7 @@ const Give = ({ item }) => {
     return (
         <div>
             <p className="left-4 text-gray-600 font-bold">
-                gmc_utilsystem/config.lua
+                gmc_item_transforms/config.lua
             </p>
             <div className="relative">
                 <CopyButton item={item} code={code} />

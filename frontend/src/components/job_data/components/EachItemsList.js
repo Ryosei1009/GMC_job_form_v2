@@ -7,7 +7,7 @@ import 'prismjs/components/prism-lua';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 const EachItemList = ({ job, userInfo, token }) => {
-    const [visible1, setVisible1] = useState(false);
+    const [visible, setVisible] = useState(false);
     const [item, setItem] = useState([]);
     const [itemList, setItemList] = useState("");
 
@@ -41,18 +41,18 @@ const EachItemList = ({ job, userInfo, token }) => {
 
     useEffect(() => {
         Prism.highlightAll();
-    }, [itemList, visible1]);
+    }, [itemList, visible]);
     return (
         <div>
             <p className="left-4 text-gray-600 font-bold">
-                qb-core/items.lua <span className="text-black"><GetJobName job_id={job} /></span>
+                ox_inventory/data/items.lua <span className="text-black"><GetJobName job_id={job} /></span>
             </p>
             <div className="relative">
                 <CopyButton code={itemList} />
-                <span onClick={() => setVisible1(!visible1)} className="absolute top-2 right-24 bg-[#4CAF50] rounded-md px-2 cursor-pointer">
+                <span onClick={() => setVisible(!visible)} className="absolute top-2 right-24 bg-[#4CAF50] rounded-md px-2 cursor-pointer">
                     <ChevronDownIcon className="h-8 w-8 fill-white inline-block" />
                 </span>
-                <pre className={`scroll-hidden ${!visible1 && "max-h-12"}`}>
+                <pre className={`scroll-hidden ${!visible && "max-h-12"}`}>
                     <code className="language-lua pr-16">
                         {itemList}
                     </code>

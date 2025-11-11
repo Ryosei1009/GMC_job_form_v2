@@ -3,6 +3,9 @@ import EachMaterialList from './components/EachMaterialList';
 import EachCraftList from './components/EachCraftList';
 import EachItemList from './components/EachItemsList';
 import EachEffectList from './components/EachEffectList';
+import EachAudio from './components/EachAudio';
+import EachGive from './components/EachGive';
+import EachImage from './components/EachImage';
 
 const JobData = ({ userInfo, token }) => {
     const [jobs, setJobs] = useState([]);
@@ -40,6 +43,9 @@ const JobData = ({ userInfo, token }) => {
                 <EachCraftList job={job} userInfo={userInfo} token={token} />
                 <EachItemList job={job} userInfo={userInfo} token={token} />
                 <EachEffectList job={job} userInfo={userInfo} token={token} />
+                <EachImage job={job} userInfo={userInfo} token={token} />
+                <EachAudio job={job} userInfo={userInfo} token={token} />
+                <EachGive job={job} userInfo={userInfo} token={token} />
             </div>
         </div>
     )

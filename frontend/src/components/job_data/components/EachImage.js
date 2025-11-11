@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { CopyButton } from '../../newitem_list/EachItem';
-import GetJobName from '../../../utils/AccountUtil';
-import '../../newitem_list/code.css'
-import Prism from 'prismjs';
-import 'prismjs/components/prism-lua';
+import React, {useState, useEffect} from 'react'
+import { CopyButton } from '../../newitem_list/EachItem'
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
-const EachCraftList = ({ job, userInfo, token }) => {
+const EachImage = ({ job, userInfo, token }) => {
     const [visible, setVisible] = useState(false);
     const [item, setItem] = useState([]);
-    const [craftList, setCraftList] = useState("");
+    const [imageList, setImageList] = useState("");
 
     useEffect(() => {
         setItem([]);
@@ -22,7 +18,7 @@ const EachCraftList = ({ job, userInfo, token }) => {
                     }
                 });
                 const data = await response.json();
-                setItem(data.filter(item => item.is_craft === 1));
+                setItem(data.filter(item => item.is_image === 1));
             } catch (error) {
                 console.error('Error fetching new item list:', error);
             }
@@ -32,41 +28,30 @@ const EachCraftList = ({ job, userInfo, token }) => {
     }, [userInfo, token, job]);
 
     useEffect(() => {
-        const updatedCraftList = item.map((item) => {
-            return `${item.item_id} = {
-            labor = 0,
-            ingredients = {${(item.craft_material1) && (`
-                ${item.craft_material1} = 1,`)}${(item.craft_material2) ? (`
-                ${item.craft_material2} = 1,`) : ""}${(item.craft_material3) ? (`
-                ${item.craft_material3} = 1,`) : ""}
-            },
-            time = 2,
-            amount = 1,
-            proficiency = 0,
-            price = 0,
-            excluding = { '${item.job}' },
-        },`;
+        const updatedImageList = item.map((item) => {
+            return `["${item.item_id}"] = {
+        type = Config.ItemTypes.MUSIC_PLAYER,
+        itemName = "${item.item_id}",
+        mp3File = "${item.item_id}.mp3",${item.emote ? `
+        emote = "${item.emote}"` : ""}
+    },\n`;
         }).join('');
-        setCraftList(updatedCraftList);
+        setImageList(updatedImageList);
     }, [item]);
 
-
-    useEffect(() => {
-        Prism.highlightAll();
-    }, [craftList, visible]);
     return (
         <div>
             <p className="left-4 text-gray-600 font-bold">
-                eco_crafting/config/craftdata.lua <span className="text-black"><GetJobName job_id={job} /></span>
+                gmc_utilsystem/config.lua
             </p>
             <div className="relative">
-                <CopyButton code={craftList} />
+                <CopyButton item={item} code={imageList} />
                 <span onClick={() => setVisible(!visible)} className="absolute top-2 right-24 bg-[#4CAF50] rounded-md px-2 cursor-pointer">
                     <ChevronDownIcon className="h-8 w-8 fill-white inline-block" />
                 </span>
                 <pre className={`scroll-hidden ${!visible && "max-h-12"}`}>
                     <code className="language-lua pr-16">
-                        {craftList}
+                        {imageList}
                     </code>
                 </pre>
             </div>
@@ -74,4 +59,4 @@ const EachCraftList = ({ job, userInfo, token }) => {
     )
 }
 
-export default EachCraftList
+export default EachImage
