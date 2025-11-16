@@ -33,7 +33,7 @@ const EachCraftList = ({ job, userInfo, token }) => {
 
     useEffect(() => {
         const updatedCraftList = item.map((item) => {
-            return `${item.item_id} = {
+            return `        ${item.item_id} = {
             labor = 0,
             ingredients = {${(item.craft_material1) && (`
                 ${item.craft_material1} = 1,`)}${(item.craft_material2) ? (`
@@ -45,7 +45,7 @@ const EachCraftList = ({ job, userInfo, token }) => {
             proficiency = 0,
             price = 0,
             excluding = { '${item.job}' },
-        },`;
+        },\n`;
         }).join('');
         setCraftList(updatedCraftList);
     }, [item]);

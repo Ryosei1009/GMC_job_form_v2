@@ -51,7 +51,7 @@ const EachMaterialList = ({ job, userInfo, token }) => {
         };
         const updatedShopItemList = shopItems.map((item) => {
             const label = getItemName(item.material_id);
-            return `{ item = "${item.material_id}", label = '${label}', price = 0 },\n`;
+            return `                { item = "${item.material_id}", label = '${label}', price = 0 },\n`;
         }).join('');
         setShopItemList(updatedShopItemList);
     }, [shopItems, itemList]);

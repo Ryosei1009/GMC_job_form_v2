@@ -123,7 +123,7 @@ const EachEffectList = ({ job, userInfo, token }) => {
 
     useEffect(() => {
         const updatedEffectList = item.map((item) => {
-            return `["${item.item_id}"] = { emote = "${selectEmote(item)}", canRun = false, time = ${getTime(item)},${selectStress(item)}${selectHeal(item)} type = "${item.effect_item_type || item.item_type}", ${getRequiredItem(item)} stats = {${selectHunger(item)}${selectThirst(item)}${getScreenEffect(item)}${getOD(item)} }${getReward(item)}},\n`;
+            return `    ["${item.item_id}"] = { emote = "${selectEmote(item)}", canRun = false, time = ${getTime(item)},${selectStress(item)}${selectHeal(item)} type = "${item.effect_item_type || item.item_type}", ${getRequiredItem(item)} stats = {${selectHunger(item)}${selectThirst(item)}${getScreenEffect(item)}${getOD(item)} }${getReward(item)}},\n`;
         }).join('');
         setEffectList(updatedEffectList);
     }, [item]);
