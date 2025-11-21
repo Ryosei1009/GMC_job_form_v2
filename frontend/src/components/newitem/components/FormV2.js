@@ -415,7 +415,7 @@ const FormV2 = ({
                         {/* 付与アイテム */}
                         <div className="flex flex-col mt-8 bg-white px-6 py-6 rounded-md border-gray-300 border-1">
                             <label className="text-lg">付与アイテム</label>
-                            <div className="text-gray-500 text-sm">複数個からランダムにしたい場合は「,」で区切ってください。(例: giveitem1, giveitem2, giveitem3)</div>
+                            <div className="text-gray-500 text-sm">複数個からランダムにしたい場合は「,」で区切ってください。(例: water, food, car)</div>
                             <div className="mt-2">
                                 <input
                                     className="border-b-2 border-b-gray-200 focus:outline-none w-full"
@@ -708,7 +708,7 @@ const FormV2 = ({
                                             その他のテキストボックス
                                         </td>
                                         <td className="text-left">
-                                            「使用後giveitem1を10個, giveitem2を2個付与してください。」
+                                            「使用後waterを10個, foodを2個付与してください。」
                                         </td>
                                     </tr>
                                 </table>
