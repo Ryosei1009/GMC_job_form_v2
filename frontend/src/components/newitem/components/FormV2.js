@@ -178,6 +178,7 @@ const FormV2 = ({
                         <option value="">選択してください。</option>
                         <option value="material">素材</option>
                         <option value="craft">クラフト</option>
+                        <option value="other">その他</option>
                     </select>
                     <div className="flex justify-between text-gray-500">
                         <div className="text-red-500 font-bold">
@@ -682,8 +683,36 @@ const FormV2 = ({
                                 付与アイテム
                             </label>
                             <div className="text-gray-500 text-sm">
-                                2個以上にしたい場合は付与アイテム欄と付与個数を空白にし、その他のテキストボックス内にアイテムを全て記載してください。<br />
-                                (例: 使用後giveitem1を10個, giveitem2を2個付与してください。)
+                                2種類以上にしたい場合は付与アイテム欄と付与個数を空欄にし、<br />
+                                その他のテキストボックス内にアイテムと個数を全て記載してください。<br /><br />
+                                付与アイテム数が2種類以上の場合：<br />
+                                <table>
+                                    <tr>
+                                        <td className="text-left">
+                                            付与アイテム欄
+                                        </td>
+                                        <td className="text-left">
+                                            空欄
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="text-left">
+                                            付与個数
+                                        </td>
+                                        <td className="text-left">
+                                            空欄
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="text-left w-40">
+                                            その他のテキストボックス
+                                        </td>
+                                        <td className="text-left">
+                                            「使用後giveitem1を10個, giveitem2を2個付与してください。」
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br />
                             </div>
                             <input
                                 className="border-b-2 border-b-gray-200 focus:outline-none"

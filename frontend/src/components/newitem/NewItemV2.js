@@ -18,6 +18,7 @@ const NewItemV2 = ({ userInfo, token }) => {
         // 素材・クラフト関連
         is_material: 0,
         is_craft: 0,
+        material_craft_selection: "", // "material", "craft", "other" のいずれか
         craft_material1: "",
         craft_material2: "",
         craft_material3: "",
@@ -89,28 +90,42 @@ const NewItemV2 = ({ userInfo, token }) => {
     };
 
     const handleMaterialCraftChange = (event) => {
-        if (event.target.value === "material") {
+        const selectedValue = event.target.value;
+
+        if (selectedValue === "material") {
             setFormData((prevData) => ({
                 ...prevData,
                 created_by: userInfo[0].id,
                 is_material: 1,
                 is_craft: 0,
+                material_craft_selection: "material",
             }));
         }
-        if (event.target.value === "craft") {
+        if (selectedValue === "craft") {
             setFormData((prevData) => ({
                 ...prevData,
                 created_by: userInfo[0].id,
                 is_material: 0,
                 is_craft: 1,
+                material_craft_selection: "craft",
             }));
         }
-        if (event.target.value === "") {
+        if (selectedValue === "other") {
             setFormData((prevData) => ({
                 ...prevData,
                 created_by: userInfo[0].id,
                 is_material: 0,
                 is_craft: 0,
+                material_craft_selection: "other",
+            }));
+        }
+        if (selectedValue === "") {
+            setFormData((prevData) => ({
+                ...prevData,
+                created_by: userInfo[0].id,
+                is_material: 0,
+                is_craft: 0,
+                material_craft_selection: "",
             }));
         }
     };
@@ -188,7 +203,7 @@ const NewItemV2 = ({ userInfo, token }) => {
         if (!files.basic_image) errors.push("basic_image");
         if (!formData.price) errors.push("price");
         if (!formData.sale_date) errors.push("sale_date");
-        if (!formData.is_craft && !formData.is_material) errors.push("craftmaterial");
+        if (!formData.material_craft_selection) errors.push("craftmaterial");
         if (!formData.job && !(userInfo[0].job2 === null || userInfo[0].job2 === "")) {
             errors.push("job");
         }
