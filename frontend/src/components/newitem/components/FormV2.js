@@ -721,12 +721,12 @@ const FormV2 = ({
                                 type="text"
                                 id="give_additem"
                                 name="give_additem"
-                                maxLength={20}
+                                maxLength={37}
                                 placeholder="giveitem"
                             />
                             <div className="flex justify-between text-gray-500">
                                 <div></div>
-                                <div>{formData.give_additem.length}/20</div>
+                                <div>{formData.give_additem.length}/37</div>
                             </div>
                         </div>
 
