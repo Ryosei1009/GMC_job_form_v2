@@ -33,19 +33,23 @@ const EachCraftList = ({ job, userInfo, token }) => {
 
     useEffect(() => {
         const updatedCraftList = item.map((item) => {
-            return `        ${item.item_id} = {
-            labor = 0,
-            ingredients = {${(item.craft_material1) && (`
-                ${item.craft_material1} = 1,`)}${(item.craft_material2) ? (`
-                ${item.craft_material2} = 1,`) : ""}${(item.craft_material3) ? (`
-                ${item.craft_material3} = 1,`) : ""}
-            },
-            time = 2,
-            amount = 1,
-            proficiency = 0,
-            price = 0,
-            excluding = { '${item.job}' },
-        },\n`;
+            return `    {
+        name = '${item.item_id}',
+        profession = 'cooking',
+        proficiency = 0,
+        chance = 100,
+        amount = 1,
+        price = 0,
+        labor = 10,
+        time = 2,
+        ingredients = {${(item.craft_material1) && (`
+            { name = '${item.craft_material1}', amount = 1, remove = true },`)}${(item.craft_material2) ? (`
+            { name = '${item.craft_material2}', amount = 1, remove = true },`) : ""}${(item.craft_material3) ? (`
+            { name = '${item.craft_material3}', amount = 1, remove = true },`) : ""}
+        },
+        whitelist = { '${item.job}' },
+        special = '${item.job}'
+    },\n`;
         }).join('');
         setCraftList(updatedCraftList);
     }, [item]);
