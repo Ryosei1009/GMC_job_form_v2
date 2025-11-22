@@ -489,6 +489,7 @@ const FormV2 = ({
                                         min="-127"
                                         max="127"
                                         placeholder="回復量（マイナス可）"
+                                        onWheel={(e) => e.target.blur()}
                                     />
                                     <div className="text-red-500 font-bold">
                                         {(displayError && formData.effect_type && !formData.effect_amount) && (uploadError.effect_amount)}
@@ -744,6 +745,7 @@ const FormV2 = ({
                                 min="1"
                                 max="200"
                                 placeholder="1"
+                                onWheel={(e) => e.target.blur()}
                             />
                             <div className="text-red-500 font-bold">
                                 {(displayError && !formData.give_addamount) && (uploadError.give_addamount)}
@@ -827,6 +829,7 @@ const FormV2 = ({
                                 id="whole_price"
                                 name="whole_price"
                                 placeholder="50000"
+                                onWheel={(e) => e.target.blur()}
                             />
                             <div className="text-red-500 font-bold">
                                 {(displayError && formData.is_wholesale === 1 && !formData.whole_price) && (uploadError.whole_price)}
@@ -919,6 +922,7 @@ const FormV2 = ({
                         id="price"
                         name="price"
                         placeholder="50000"
+                        onWheel={(e) => e.target.blur()}
                     />
                     <div className="text-red-500 font-bold">
                         {(displayError && !formData.price) && (uploadError.price)}
