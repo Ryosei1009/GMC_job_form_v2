@@ -37,7 +37,7 @@ const Footer = () => {
                                 <a href="/profile" className="text-gray-700 hover:underline">市民リスト</a>
                                 <a href="/storelist" className="text-gray-700 hover:underline">店舗リスト</a>
                                 <a href="/vehiclelist" className="text-gray-700 hover:underline">車両カタログ</a>
-                                <a href="https://sticker.gmcrp.net" className="text-gray-700 hover:underline">ステッカー申請フォーム</a>
+                                <a href="https://sticker2.gmcrp.net" className="text-gray-700 hover:underline">ステッカー申請フォーム v2</a>
                             </div>
                         </div>
                     </div>
