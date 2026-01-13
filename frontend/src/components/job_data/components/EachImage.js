@@ -30,9 +30,9 @@ const EachImage = ({ job, userInfo, token }) => {
     useEffect(() => {
         const updatedImageList = item.map((item) => {
             return `["${item.item_id}"] = {
-        type = Config.ItemTypes.MUSIC_PLAYER,
-        itemName = "${item.item_id}",
-        mp3File = "${item.item_id}.mp3",${item.emote ? `
+        type = Config.ItemTypes.SIMPLE_IMAGE,
+        image = '${item.item_id}.png',
+        baseUrl = Config.BaseURLs.itemimage,${item.emote ? `
         emote = "${item.emote}"` : ""}
     },\n`;
         }).join('');

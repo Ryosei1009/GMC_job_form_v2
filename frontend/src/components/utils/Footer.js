@@ -64,7 +64,7 @@ const Footer = () => {
                 </div>
                 <div className="flex justify-between max-lg:items-center max-lg:flex-col-reverse px-16 max-md:px-4 py-4 text-sm text-gray-700">
                     <div>
-                        ©️2025 GMCRP
+                        ©️{new Date().getFullYear()} GMCRP
                     </div>
                 </div>
             </footer>
