@@ -87,6 +87,9 @@ const EachEffectList = ({ job, userInfo, token }) => {
 
     // v2では effect_time を使用、v1互換性のため時間設定
     const getTime = (item) => {
+        if (item.effect_time && (item.effect_time == 5 || item.effect_time == 6)) {
+            return "math.random(5000, 6000)";
+        }
         if (item.effect_time) {
             return `math.random(${item.effect_time * 1000}, ${item.effect_time * 1000})`;
         }
