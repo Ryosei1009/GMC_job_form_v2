@@ -66,6 +66,9 @@ const Footer = () => {
                     <div>
                         ©️{new Date().getFullYear()} GMCRP
                     </div>
+                    <div className="flex items-center text-[0.6rem] text-gray-700">
+                        GMC RP IS NOT APPROVED, SPONSORED, OR ENDORSED BY ROCKSTAR GAMES.
+                    </div>
                 </div>
             </footer>
         </>
