@@ -97,4 +97,5 @@ GMC RP は約 2 年間、日本トップの人気を誇ったサーバーです�
 
 - GitHub: [@Ryosei1009](https://github.com/Ryosei1009)
 - Portfolio: [www.shinoryo.com](https://www.shinoryo.com)
+- Mail: shinoryo1009@gmail.com
 - GMC RP 公式 X: [@GMCROLEPLAY](https://x.com/GMCROLEPLAY)
